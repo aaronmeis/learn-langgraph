@@ -1,0 +1,12 @@
+Welcome to the Simple LangGraph Example! This demonstrates core LangGraph concepts without needing any AI models.
+
+LangGraph uses StateGraph, which is the foundation for building workflows. We define our state using Pydantic's BaseModel - this is LangGraph's way of ensuring type safety and validation. The WorkflowState class contains fields like user_input, processed_input, word_count, sentiment, and response. This state flows through the entire graph, and LangGraph automatically manages state updates between nodes.
+
+We use LangGraph's add_node method to register functions as nodes. The process_input node cleans the user's text and counts words. The analyze_sentiment node uses simple keyword matching. LangGraph passes the state to each node function, and whatever dictionary you return gets merged into the state - this is LangGraph's automatic state merging feature.
+
+Then we have three response generation nodes. LangGraph's add_edge connects nodes in sequence, but the real power comes from add_conditional_edges. This allows dynamic routing based on state values. After analyze_sentiment, a conditional edge function checks the sentiment value and routes to the appropriate response node - positive, negative, or neutral.
+
+LangGraph's START and END constants mark entry and exit points. The graph flows: START to process_input, then analyze_sentiment, then conditionally routes to one of three response nodes, each ending at END.
+
+This example shows how LangGraph's StateGraph manages state automatically, how nodes process and update state, and how conditional edges create intelligent branching. LangGraph handles all the complexity of state management, so you just focus on your business logic. It's a perfect introduction to graph-based workflow systems.
+

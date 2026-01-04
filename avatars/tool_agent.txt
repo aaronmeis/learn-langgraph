@@ -1,0 +1,12 @@
+The Tool Agent example demonstrates the ReAct pattern using LangGraph's cycle capabilities: Reason, Act, and Observe!
+
+This creates an intelligent agent that can use tools to answer questions. LangGraph's StateGraph makes this pattern natural - we use the same graph structure with cycles, but now the nodes coordinate between LLM reasoning and tool execution.
+
+The graph uses LangGraph's add_conditional_edges to create a cycle between reasoning and tool execution. The reason node uses the LLM to analyze the query and updates the state with either a tool_name and tool_args, or a final_answer. LangGraph's conditional edge function checks the state and routes accordingly: if tool_name is set, route to execute; if final_answer exists, route to respond.
+
+Available tools are just Python functions - get_current_time, calculate, and get_weather. LangGraph doesn't care what the tools do - they're just regular functions that become nodes. The execute_tool node runs the selected tool based on tool_name in the state, and updates the state with tool_result. LangGraph's state merging automatically makes this result available to the next node.
+
+After getting a tool result, LangGraph's add_edge creates a cycle back to the reason node. The LLM now sees both the original query and the tool result in the state, allowing it to synthesize a complete answer. This cycle continues until the agent sets final_answer in the state, which routes to the respond node and then END.
+
+This ReAct pattern is fundamental to building AI agents. LangGraph makes it easy because reasoning and tool execution are just nodes, the cycle is a simple edge, and LangGraph's state management automatically passes information between them. The state acts as the shared memory between reasoning and tool execution steps, and LangGraph handles all the orchestration.
+

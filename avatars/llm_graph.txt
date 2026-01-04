@@ -1,0 +1,14 @@
+Now let's explore the LLM-powered sentiment analysis example! This builds on the simple example by replacing keyword matching with actual AI reasoning.
+
+We use the same LangGraph StateGraph structure, but now demonstrate how LangGraph makes LLM integration seamless. The key difference is we use Ollama, a local LLM that runs on your machine. No API keys needed! We connect to Ollama using the OpenAI-compatible API at localhost port 11434.
+
+The workflow state uses the same Pydantic BaseModel pattern, but now includes confidence scores and reasoning from the LLM. LangGraph's state management handles these new fields automatically - you just add them to your state model and LangGraph takes care of the rest.
+
+The analyze_sentiment_llm node demonstrates LangGraph's flexibility: any function can be a node, including async operations or external API calls. This node sends the text to Ollama with a carefully crafted prompt asking for structured JSON output. LangGraph doesn't care that we're making an HTTP request - it just treats it as another node in the graph.
+
+The LLM analyzes the text's emotional tone and provides nuanced classification. The response includes a confidence percentage and reasoning. LangGraph's state merging automatically updates the state with these new fields, and then the same conditional edge routing from the simple example takes over.
+
+This demonstrates how LangGraph seamlessly integrates LLM calls into workflow nodes. The graph structure stays the same - we just swapped out one node's implementation. LangGraph's abstraction means you can mix simple functions, LLM calls, database queries, or any other operation - they all work the same way in the graph.
+
+The beauty of LangGraph is that LLM processing is just another node - the same StateGraph, add_node, and add_conditional_edges patterns work whether you're doing simple calculations or complex AI reasoning. LangGraph handles the orchestration, so you can focus on building intelligent workflows.
+

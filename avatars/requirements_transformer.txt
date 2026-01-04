@@ -1,0 +1,12 @@
+The Requirements Transformer demonstrates Human-in-the-Loop workflows using LangGraph's conditional routing and checkpointing!
+
+This pipeline uses LangGraph's StateGraph with human review nodes integrated into the flow. It transforms a generic requirements document into IEEE 830 format using six main steps, with two human review checkpoints implemented as special nodes. LangGraph's add_edge connects the steps sequentially, but add_conditional_edges after human nodes enables dynamic routing based on human decisions.
+
+After the mapping analysis step, LangGraph routes to a human_review_mapping node. This node sets human_review_required to True in the state, pausing the workflow. LangGraph's checkpointing system saves the state at this point, so the workflow can be resumed later. When the human approves, the node sets human_approved to True, and LangGraph's conditional edge function routes based on this state value.
+
+The conditional edge function uses LangGraph's routing pattern: it checks human_approved in the state. If True, it routes to transform; if False, it routes back to analyze_mapping, creating a feedback loop. This demonstrates how LangGraph's add_conditional_edges can route to any node, including previous nodes, enabling complex control flow.
+
+After transformation and validation, another human_approval_final node appears. Again, LangGraph's checkpointing saves state, and conditional routing decides whether to generate output or end. The state includes human_review_required, human_approved, and human_feedback fields that LangGraph automatically manages through its state merging.
+
+This pattern is essential for production AI systems. LangGraph makes human-in-the-loop workflows natural - human review is just another node type, and LangGraph's conditional edges handle the routing logic. The checkpointing system ensures state persistence, so workflows can pause for human input and resume reliably. LangGraph's abstraction means you can implement HITL workflows without complex state management code - the graph structure handles it all.
+

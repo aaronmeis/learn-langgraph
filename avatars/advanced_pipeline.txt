@@ -1,0 +1,12 @@
+The Advanced Pipeline example showcases a complex multi-step document processing workflow using LangGraph's sequential edge chaining!
+
+The pipeline uses LangGraph's StateGraph with seven nodes connected by add_edge in sequence. Each step processes the state and adds new fields: load_document adds raw_content, parse_document adds parsed_json, extract_sections adds sections_list, and so on. LangGraph's automatic state merging means each node sees all previous data and can add its own contributions.
+
+The key LangGraph feature here is state accumulation. The Pydantic state model defines all fields upfront - document, sections, analyses, final_report. As the graph flows through nodes, each node updates specific fields, and LangGraph automatically merges these updates into the state. This means later nodes have access to everything that happened before, without manual state passing.
+
+The pipeline demonstrates LangGraph's linear workflow pattern using sequential edges. START connects to load_document, which connects to parse_document, and so on through all seven steps to END. LangGraph ensures each node completes before the next starts, and the state flows through automatically.
+
+The LLM analysis step shows LangGraph's flexibility - you can have nodes that process subsets of data. This node iterates through sections and calls the LLM for each, updating the state with multiple analyses. LangGraph's state merging handles this naturally - you just return a dictionary with the new analyses, and LangGraph adds them to the state.
+
+This pattern is perfect for data pipelines because LangGraph handles all the orchestration. You define the nodes and edges, and LangGraph ensures proper sequencing, state management, and error handling. The state acts as a shared data structure that grows as it flows through the pipeline, and LangGraph makes this accumulation automatic and type-safe through Pydantic.
+

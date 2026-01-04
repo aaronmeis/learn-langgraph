@@ -1,0 +1,12 @@
+The General Examples Web App demonstrates how LangGraph workflows integrate seamlessly into web applications!
+
+This Flask web application wraps the same LangGraph StateGraph workflows we've seen in CLI examples, showing how LangGraph's invoke method works identically whether called from Python scripts or web APIs. The app includes five examples, each using the same graph creation functions - create_simple_graph, create_llm_graph, create_chat_graph, and so on.
+
+Each Flask route creates a graph instance and calls invoke with the request data. LangGraph's invoke method returns the final state as a dictionary, which Flask converts to JSON for the browser. The key insight is that LangGraph graphs are stateless functions - you can create them, invoke them with different inputs, and they work the same way every time. This makes them perfect for web APIs.
+
+For persistent chat, the app uses LangGraph's checkpointing with thread IDs. Each web session gets a thread ID stored in Flask's session, and when invoking the graph, it passes config={"configurable": {"thread_id": thread_id}}. LangGraph's MemorySaver checkpointer automatically loads the conversation history for that thread, so the web app maintains conversation state across requests without any custom persistence code.
+
+The tool agent example shows LangGraph's state in action - the web app displays the steps list from the state, showing how the agent reasoned and which tools it called. LangGraph's state management makes this transparent - the state contains all intermediate steps, and the web app just displays them.
+
+This demonstrates LangGraph's flexibility: the same graph code works in CLI, web APIs, or any Python environment. LangGraph handles state management, node execution, and routing - you just call invoke with input data and get back the result. The separation between graph logic and interfaces means you can build web UIs, mobile apps, or CLI tools all using the same LangGraph workflows.
+

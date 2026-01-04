@@ -1,0 +1,14 @@
+The Requirements Transformer Web App provides a visual interface showcasing LangGraph's Human-in-the-Loop capabilities in a web environment!
+
+This Flask application wraps the LangGraph StateGraph with human review nodes, demonstrating how LangGraph's checkpointing and conditional routing work in a web context. The web app invokes the same graph we saw in the CLI example, but now provides a visual interface for the human review checkpoints that LangGraph's workflow creates.
+
+When the LangGraph pipeline reaches a human review node, it sets human_review_required to True in the state. The web app detects this in the returned state and displays approval buttons. When you click approve, the web app calls the graph again with human_approved set to True. LangGraph's conditional edges then route based on this state value - if approved, continue to the next step; if not, loop back.
+
+The key LangGraph feature here is state inspection. The web app can examine the state returned from invoke to see which step is active, what data has been processed, and whether human input is needed. LangGraph's state is just a dictionary, so the web app can easily check fields like current_step, human_review_required, and human_approved to determine what UI to show.
+
+The pipeline progress visualization tracks LangGraph's execution through nodes. Each step corresponds to a LangGraph node execution, and the state accumulates data as it flows through. The web app displays this by showing which node just completed and what data it added to the state.
+
+The real-time log streaming shows LangGraph's node execution in action. Each log entry corresponds to a node processing the state, calling the LLM, or updating state fields. This transparency comes from LangGraph's straightforward execution model - nodes are just functions that receive and return state updates, making it easy to log and visualize.
+
+This web interface demonstrates how LangGraph's graph structure, state management, and conditional routing make complex HITL workflows accessible. LangGraph handles the workflow orchestration, and the web app just provides a friendly interface for the human decision points that LangGraph's conditional edges create.
+
