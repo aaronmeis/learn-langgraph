@@ -1,0 +1,80 @@
+{
+  "report": {
+    "title": "Analysis Report: Project Requirements Document",
+    "generated_at": "2026-01-04T04:21:23.925348",
+    "pipeline_version": "1.0.0"
+  },
+  "summary": {
+    "document_title": "Project Requirements Document",
+    "total_sections": 4,
+    "total_subsections": 5,
+    "total_requirements": 15,
+    "analyses_performed": 3
+  },
+  "detailed_analysis": [
+    {
+      "section": "1. Overview",
+      "analysis_type": "section_analysis",
+      "result": {
+        "raw_analysis": "**Analysis in JSON Format**\n\n**Summary**\n- The document outlines the requirements for a new Customer Portal system, which serves as the primary interface for customer interactions.\n\n**Key Requirements or Points**\n* Define the scope of the Customer Portal system\n* Identify the key features and functionalities required\n* Determine the technical specifications and infrastructure needs\n\n**Priority Level**\nMedium\n\n**Potential Risks or Concerns**\n- Technical feasibility and implementation challenges\n- Integration with existing systems and processes\n- Security and data protection concerns"
+      }
+    },
+    {
+      "section": "2. Functional Requirements",
+      "analysis_type": "section_analysis",
+      "result": {
+        "raw_analysis": "**Document Summary**\nThe provided document section outlines the functional requirements for a technical analysis system. It details the features and functionalities that the system should support, including data processing, visualization, and reporting.\n\n**Key Requirements/Points**\n\n* The system should be able to process large datasets in real-time.\n* It should be capable of generating various types of visualizations (charts, graphs, etc.) using different chart types.\n* The system should provide customizable dashboards with multiple widgets for easy data exploration.\n* It should support multiple data sources (e.g., APIs, databases) and allow for seamless integration.\n* The system should have a user-friendly interface for end-users to interact with the analysis capabilities.\n* It should be scalable and secure to handle high traffic and sensitive data.\n\n**Priority Level**\nMedium\n\n**Potential Risks/Concerns**\n\n* Insufficient scalability may lead to performance issues or downtime during peak usage periods.\n* Inadequate security measures may compromise user data and system integrity.\n* Limited customization options for end-users may hinder the effectiveness of the analysis system."
+      }
+    },
+    {
+      "section": "2.1 User Authentication",
+      "analysis_type": "requirement_analysis",
+      "result": {
+        "raw_analysis": "```json\n{\n  \"section\": \"2.1 User Authentication\",\n  \"requirements\": [\n    {\n      \"name\": \"Registration with Email\",\n      \"description\": \"Users must be able to register with their email address\"\n    },\n    {\n      \"name\": \"Password Requirements\",\n      \"description\": \"Password requirements: 8+ characters, 1 number, 1 special char\"\n    },\n    {\n      \"name\": \"OAuth Support\",\n      \"description\": \"Support for OAuth (Google, Microsoft)\"\n    }\n  ],\n  \"feasibilityAssessment\": {\n    \"complexityLevel\": \"Medium\",\n    \"effortEstimation\": {\n      \"hours\": 10\n    }\n  },\n  \"implementationComplexity\": {\n    \"simple\": false,\n    \"medium\": true,\n    \"complex\": true\n  },\n  \"dependenciesOnOtherFeatures\": [\n    {\n      \"feature\": \"User Management\",\n      \"dependencyLevel\": \"High\"\n    }\n  ],\n  \"estimatedEffort\": {\n    \"hours\": 20\n  }\n}\n```\n\nNote: The estimated effort of 20 hours includes the complexity level, implementation complexity, and dependencies on other features."
+      }
+    }
+  ],
+  "sections_overview": [
+    {
+      "title": "1. Overview",
+      "has_subsections": false,
+      "subsection_count": 0
+    },
+    {
+      "title": "2. Functional Requirements",
+      "has_subsections": true,
+      "subsection_count": 3
+    },
+    {
+      "title": "3. Non-Functional Requirements",
+      "has_subsections": true,
+      "subsection_count": 2
+    },
+    {
+      "title": "4. Timeline",
+      "has_subsections": false,
+      "subsection_count": 0
+    }
+  ],
+  "processing_metadata": {
+    "started_at": "2026-01-04T04:21:18.399276",
+    "completed_at": "2026-01-04T04:21:23.925353",
+    "steps_completed": 13,
+    "processing_log": [
+      "Step 1 started: 2026-01-04T04:21:18.399233",
+      "Loaded document: 968 chars",
+      "Step 2 started: 2026-01-04T04:21:18.399688",
+      "Parsed 4 sections",
+      "Step 3 started: 2026-01-04T04:21:18.400161",
+      "Extracted 9 items",
+      "Step 4 started: 2026-01-04T04:21:18.400496",
+      "Generated 9 prompts",
+      "Step 5 started: 2026-01-04T04:21:18.400807",
+      "LLM analyzed 3 sections",
+      "Step 6 started: 2026-01-04T04:21:23.924865",
+      "Schema seeded with 3 analyses",
+      "Step 7 started: 2026-01-04T04:21:23.925343",
+      "Step 7 completed: 2026-01-04T04:21:23.925354"
+    ]
+  }
+}

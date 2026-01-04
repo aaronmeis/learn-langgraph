@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangGraph Examples - Interactive Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-bottom: 2px solid rgba(123, 44, 191, 0.5);
+        }
+
+        .header h1 {
+            text-align: center;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            text-align: center;
+            opacity: 0.8;
+            font-size: 1.1em;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .main-content {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+            height: calc(100vh - 200px);
+            max-height: calc(100vh - 200px);
+        }
+
+        .video-panel {
+            width: 350px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 20px;
+            height: calc(100vh - 200px);
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .video-panel h2 {
+            color: #00d4ff;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            text-align: center;
+        }
+
+        .video-container {
+            width: 100%;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            aspect-ratio: 9/16;
+            max-height: 600px;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .video-placeholder {
+            width: 100%;
+            aspect-ratio: 9/16;
+            max-height: 600px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+        }
+
+        .video-placeholder p {
+            text-align: center;
+            opacity: 0.6;
+            padding: 20px;
+        }
+
+        .video-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .video-info strong {
+            color: #00d4ff;
+        }
+
+        .example-selector {
+            margin-bottom: 25px;
+        }
+
+        .example-selector label {
+            display: block;
+            margin-bottom: 10px;
+            color: #00d4ff;
+            font-weight: 600;
+        }
+
+        .example-selector select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .example-selector select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        .example-selector select:focus {
+            outline: none;
+            border-color: #7b2cbf;
+        }
+
+        .code-section {
+            margin-bottom: 30px;
+        }
+
+        .code-section h3 {
+            color: #00d4ff;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            border-bottom: 2px solid rgba(123, 44, 191, 0.5);
+            padding-bottom: 10px;
+        }
+
+        .code-section p {
+            line-height: 1.8;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            overflow-y: auto;
+            margin: 15px 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            max-height: 500px;
+        }
+
+        .code-block pre {
+            margin: 0;
+            padding: 0;
+            white-space: pre;
+            word-wrap: normal;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            color: #a8e6cf;
+            display: block;
+            white-space: pre;
+            font-family: inherit;
+            margin: 0;
+            padding: 0;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            padding-left: 25px;
+            position: relative;
+            opacity: 0.9;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #00d4ff;
+            font-weight: bold;
+        }
+
+        .run-button {
+            background: linear-gradient(90deg, #7b2cbf, #00d4ff);
+            border: none;
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: opacity 0.3s;
+        }
+
+        .run-button:hover {
+            opacity: 0.9;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            margin-left: 10px;
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .video-panel {
+                width: 100%;
+                position: relative;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>LangGraph Examples - Interactive Demo</h1>
+        <p>Explore LangGraph workflows with AI-powered explanations</p>
+    </div>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="example-selector">
+                <label for="exampleSelect">Select Example:</label>
+                <select id="exampleSelect" onchange="loadExample()">
+                    <option value="simple_graph">A: Simple Graph (Basic Sentiment)</option>
+                    <option value="llm_graph">B: LLM Graph (AI Sentiment Analysis)</option>
+                    <option value="chat_loop">C: Chat Loop (Multi-turn Conversation)</option>
+                    <option value="persistent_chat">D: Persistent Chat (Checkpointing)</option>
+                    <option value="tool_agent">E: Tool Agent (ReAct Pattern)</option>
+                    <option value="advanced_pipeline">F: Advanced Pipeline (Document Processing)</option>
+                    <option value="requirements_transformer">G: Requirements Transformer (HITL)</option>
+                    <option value="app_web_ui">H: General Examples Web App</option>
+                    <option value="transformer_web_ui">I: Transformer Web App</option>
+                </select>
+            </div>
+
+            <div id="exampleContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+
+        <div class="video-panel">
+            <h2>AI Explanation</h2>
+            <div id="videoContainer" class="video-placeholder">
+                <p>Select an example to view the AI explanation video</p>
+            </div>
+            <div class="video-info">
+                <p><strong>Duration:</strong> <span id="videoDuration">90-120 seconds</span></p>
+                <p><strong>Format:</strong> MP4 with HeyGen Avatar</p>
+                <p><strong>Content:</strong> Code walkthrough and explanation</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const examples = {
+            simple_graph: {
+                title: "Simple Graph - Basic Sentiment Analysis",
+                description: "This example demonstrates core LangGraph concepts without requiring any AI models. It shows how to define state, create nodes, and use conditional routing.",
+                features: [
+                    "Pydantic state management",
+                    "Node functions for processing",
+                    "Conditional routing based on sentiment",
+                    "No LLM required - uses keyword matching"
+                ],
+                code: `# 1. Define State with Pydantic
+class WorkflowState(BaseModel):
+    user_input: str = ""
+    processed_input: str = ""
+    word_count: int = 0
+    sentiment: Literal["positive", "negative", "neutral"] = "neutral"
+    response: str = ""
+
+# 2. Define Node Functions
+def process_input(state: WorkflowState) -> dict:
+    cleaned = state.user_input.strip()
+    return {"processed_input": cleaned, "word_count": len(cleaned.split())}
+
+def analyze_sentiment(state: WorkflowState) -> dict:
+    # Keyword-based sentiment analysis
+    positive_words = {"good", "great", "love", "happy", "wonderful"}
+    negative_words = {"bad", "terrible", "hate", "sad", "awful"}
+    # ... compare word sets and return sentiment
+
+# 3. Build Graph with Conditional Routing
+builder = StateGraph(WorkflowState)
+builder.add_node("process_input", process_input)
+builder.add_node("analyze_sentiment", analyze_sentiment)
+builder.add_conditional_edges("analyze_sentiment", route_by_sentiment,
+    {"positive": "positive", "negative": "negative", "neutral": "neutral"})
+
+# Graph: START → process_input → analyze_sentiment 
+#   → [positive/negative/neutral] → END`,
+                video: "avatars/simple.mp4",
+                script: "avatars/simple_graph.txt"
+            },
+            llm_graph: {
+                title: "LLM Graph - AI-Powered Sentiment Analysis",
+                description: "This example enhances the simple graph by using Ollama (local LLM) for intelligent sentiment analysis with confidence scores and reasoning.",
+                features: [
+                    "Ollama integration (local LLM)",
+                    "Structured JSON output from LLM",
+                    "Confidence scores and reasoning",
+                    "OpenAI-compatible API"
+                ],
+                code: `# 1. Define Structured Output Model
+class SentimentAnalysis(BaseModel):
+    sentiment: Literal["positive", "negative", "neutral"]
+    confidence: float  # 0.0 to 1.0
+    reasoning: str
+
+# 2. Create Ollama Client (OpenAI-compatible)
+OLLAMA_BASE_URL = "http://localhost:11434/v1"
+client = OpenAI(base_url=OLLAMA_BASE_URL, api_key="ollama")
+
+# 3. Call LLM with Structured Output
+response = client.chat.completions.create(
+    model="llama3.2:1b",
+    temperature=0.0,
+    messages=[
+        {"role": "system", "content": "Analyze sentiment. Return JSON..."},
+        {"role": "user", "content": text}
+    ]
+)
+
+# 4. Parse JSON response into Pydantic model
+result = SentimentAnalysis(**json.loads(response.choices[0].message.content))`,
+                video: "avatars/llm_example.mp4",
+                script: "avatars/llm_graph.txt"
+            },
+            chat_loop: {
+                title: "Chat Loop - Multi-turn Conversation",
+                description: "Demonstrates cycles in LangGraph, creating a continuous conversation loop that maintains context across multiple turns.",
+                features: [
+                    "Conversation cycles (loops)",
+                    "Message history preservation",
+                    "Context-aware responses",
+                    "Conditional exit on 'bye'"
+                ],
+                code: `# 1. Define State with Message History
+class Message(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str
+
+class ChatState(BaseModel):
+    messages: list[Message] = []  # Full conversation history
+    current_input: str = ""
+    should_continue: bool = True
+
+# 2. Create Cycle with Conditional Edge
+builder = StateGraph(ChatState)
+builder.add_node("get_input", get_user_input)
+builder.add_node("process_message", process_message)
+builder.add_node("generate_response", generate_response)
+builder.add_conditional_edges("generate_response", should_continue,
+    {"continue": "get_input", "end": END})
+builder.add_edge("get_input", "process_message")
+builder.add_edge("process_message", "generate_response")
+
+# Graph creates a cycle:
+# START → get_input → process_message → generate_response 
+#   → [continue/end] → get_input (loop back)`,
+                video: "avatars/chatloop.mp4",
+                script: "avatars/chat_loop.txt"
+            },
+            persistent_chat: {
+                title: "Persistent Chat - Checkpointing",
+                description: "Shows how to save and resume conversations using LangGraph's checkpointing system with thread IDs.",
+                features: [
+                    "MemorySaver checkpointer",
+                    "Thread-based conversations",
+                    "State persistence",
+                    "Multiple concurrent threads"
+                ],
+                code: `# 1. Import Checkpointer
+from langgraph.checkpoint.memory import MemorySaver
+
+# 2. Create and Configure Checkpointer
+checkpointer = MemorySaver()
+workflow = builder.compile(checkpointer=checkpointer)
+
+# 3. Use Thread IDs for Separate Conversations
+# Each thread maintains its own conversation history
+config = {"configurable": {"thread_id": "alice-123"}}
+result = workflow.invoke(
+    {"messages": [], "current_input": "Hi!"},
+    config=config
+)
+
+# 4. Resume Conversation Later
+# Same thread_id retrieves previous state
+result = workflow.invoke(
+    {"messages": result["messages"], "current_input": "What did I say?"},
+    config=config  # Same thread_id = same memory`,
+                video: "avatars/persistent chat.mp4",
+                script: "avatars/persistent_chat.txt"
+            },
+            tool_agent: {
+                title: "Tool Agent - ReAct Pattern",
+                description: "Implements the ReAct (Reason-Act-Observe) pattern, where an AI agent reasons about queries and uses tools to answer questions.",
+                features: [
+                    "ReAct pattern implementation",
+                    "Tool calling (time, calculate, weather)",
+                    "Reasoning loop",
+                    "Tool result integration"
+                ],
+                code: `# 1. Define Tools
+TOOLS = {
+    "get_current_time": lambda: datetime.now().strftime("%A, %B %d, %Y at %I:%M %p"),
+    "calculate": lambda expr: str(eval(expr)) if safe(expr) else "Error",
+    "get_weather": lambda city: get_real_weather(city)  # Real API with fallback
+}
+
+# 2. ReAct Pattern: Reason → Act → Observe
+def agent_reason(state: AgentState) -> dict:
+    # LLM decides: use tool or provide answer
+    response = llm_call(f"Query: {state.query}")
+    if "tool" in response:
+        return {"tool_name": response["tool"], "tool_args": response["args"]}
+    return {"final_answer": response["answer"]}
+
+def agent_execute(state: AgentState) -> dict:
+    # Execute tool and return result
+    result = TOOLS[state.tool_name](state.tool_args)
+    return {"tool_result": result}
+
+# 3. Build ReAct Cycle
+builder.add_node("reason", agent_reason)
+builder.add_node("execute", agent_execute)
+builder.add_conditional_edges("reason", route_decision,
+    {"execute": "execute", "end": END})
+builder.add_edge("execute", "reason")  # Loop back
+
+# Cycle: reason → [need_tool/have_answer] → execute_tool → reason...`,
+                video: "avatars/tool.mp4",
+                script: "avatars/tool_agent.txt"
+            },
+            advanced_pipeline: {
+                title: "Advanced Pipeline - Document Processing",
+                description: "A complex 7-step document processing pipeline that demonstrates state accumulation and multi-stage workflows.",
+                features: [
+                    "7-step processing pipeline",
+                    "State accumulation across steps",
+                    "LLM analysis integration",
+                    "JSON output generation"
+                ],
+                code: `# 1. Define Pipeline State
+class PipelineState(BaseModel):
+    document: str = ""
+    parsed_json: dict = {}
+    sections: list[Section] = []
+    llm_analyses: list[dict] = []
+    final_report: dict = {}
+    current_step: str = ""
+    error_count: int = 0
+
+# 2. Define 7 Processing Steps
+def step1_load_document(state: PipelineState) -> dict:
+    return {"document": load_file(), "current_step": "step1_load"}
+
+def step2_parse_to_json(state: PipelineState) -> dict:
+    return {"parsed_json": parse_document(state.document), ...}
+
+# ... step3_extract, step4_prompts, step5_llm, step6_seed, step7_merge
+
+# 3. Build Pipeline with Error Handling
+builder.add_node("step1_load", step1_load_document)
+builder.add_node("step2_parse", step2_parse_to_json)
+# ... add all 7 steps
+builder.add_node("error_handler", handle_error)
+
+# 4. Add Error Handling with Retry/Rollback
+builder.add_conditional_edges("step1_load", check_error,
+    {"success": "step2_parse", "error": "error_handler"})
+
+# Pipeline: START → step1_load → step2_parse → step3_extract 
+#   → step4_prompts → step5_llm → step6_seed → step7_merge → END
+#   With error_handler → retry/rollback support`,
+                video: "avatars/adv_example.mp4",
+                script: "avatars/advanced_pipeline.txt"
+            },
+            requirements_transformer: {
+                title: "Requirements Transformer - Human-in-the-Loop",
+                description: "Demonstrates Human-in-the-Loop workflows with review checkpoints where humans approve or modify AI outputs.",
+                features: [
+                    "Human review checkpoints",
+                    "Approval/rejection routing",
+                    "Document transformation",
+                    "IEEE 830 format conversion"
+                ],
+                code: `# 1. Define HITL State
+class TransformState(BaseModel):
+    source_doc: str = ""
+    template_doc: str = ""
+    mapping_analysis: dict = {}
+    human_review_required: bool = False
+    human_approved: bool = False
+    human_feedback: str = ""
+    transformed_doc: str = ""
+
+# 2. Human Review Checkpoint
+def step3_analyze_mapping(state: TransformState) -> dict:
+    analysis = llm_analyze_mapping(state.source_doc, state.template_doc)
+    return {
+        "mapping_analysis": analysis,
+        "human_review_required": True  # Trigger human review
+    }
+
+# 3. Human Approval Routing
+def route_after_review(state: TransformState) -> str:
+    if state.human_approved:
+        return "continue"  # Proceed to transform
+    return "revise"  # Go back to analyze_mapping
+
+# 4. Build HITL Pipeline
+builder.add_conditional_edges("step3_analyze_mapping", route_after_review,
+    {"continue": "step4_transform", "revise": "step3_analyze_mapping"})
+
+# HITL Flow:
+# START → load_source → load_template → analyze_mapping 
+#   → [HUMAN REVIEW] → transform → validate 
+#   → [HUMAN APPROVAL] → generate_output → END`,
+                video: "avatars/requirements.mp4",
+                script: "avatars/requirements_transformer.txt"
+            },
+            app_web_ui: {
+                title: "General Examples Web App",
+                description: "A Flask web application providing an interactive browser interface for all LangGraph examples.",
+                features: [
+                    "Flask web interface",
+                    "Tabbed example selection",
+                    "Real-time Ollama status",
+                    "Interactive chat interfaces"
+                ],
+                code: `# 1. Flask App Setup
+app = Flask(__name__)
+app.secret_key = secrets.token_hex(16)
+
+# 2. Create Graph Functions for Each Example
+def create_simple_graph():
+    builder = StateGraph(SimpleState)
+    builder.add_node("analyze", simple_analyze)
+    return builder.compile()
+
+# ... create_llm_graph(), create_chat_graph(), etc.
+
+# 3. API Routes for Each Example
+@app.route('/api/simple', methods=['POST'])
+def api_simple():
+    graph = create_simple_graph()
+    result = graph.invoke({"user_input": request.json['input']})
+    return jsonify(result)
+
+@app.route('/api/llm', methods=['POST'])
+def api_llm():
+    # LLM sentiment analysis endpoint
+    ...
+
+@app.route('/api/chat', methods=['POST'])
+def api_chat():
+    # Multi-turn chat endpoint
+    ...
+
+# 4. Web Interface
+@app.route('/')
+def index():
+    return render_template_string(HTML, ollama_status=check_ollama())
+
+# Runs on http://localhost:8080
+# Provides interactive web UI for examples A-E`,
+                video: "avatars/1.mp4",
+                script: "avatars/app_web_ui.txt"
+            },
+            transformer_web_ui: {
+                title: "Transformer Web App - Visual HITL",
+                description: "A visual web interface for the requirements transformation pipeline with real-time progress and human approval buttons.",
+                features: [
+                    "Real-time pipeline visualization",
+                    "Interactive HITL buttons",
+                    "Document tabs (Source/Template/Output)",
+                    "Live log streaming"
+                ],
+                code: `# 1. Flask App with Session Management
+app = Flask(__name__)
+app.secret_key = "transformer-secret-key-2025"
+
+# 2. Pipeline Execution Endpoint
+@app.route('/api/run_pipeline', methods=['POST'])
+def run_pipeline():
+    thread_id = str(uuid.uuid4())
+    config = {"configurable": {"thread_id": thread_id}}
+    
+    # Run pipeline with HITL checkpoints
+    result = transformer_graph.invoke(state, config=config)
+    return jsonify({"status": "complete", "output": result})
+
+# 3. Human Approval Endpoints
+@app.route('/api/approve', methods=['POST'])
+def approve_step():
+    # Update state with human approval
+    state.human_approved = True
+    return jsonify({"status": "approved"})
+
+@app.route('/api/reject', methods=['POST'])
+def reject_step():
+    # Update state with human feedback
+    state.human_approved = False
+    state.human_feedback = request.json['feedback']
+    return jsonify({"status": "rejected"})
+
+# 4. Web Interface Features
+# - Real-time pipeline progress visualization
+# - Document tabs (Source, Template, Output)
+# - Interactive Approve/Reject buttons
+# - Live log streaming via Server-Sent Events
+
+# Runs on http://localhost:5001`,
+                video: "avatars/transformer.mp4",
+                script: "avatars/transformer_web_ui.txt"
+            }
+        };
+
+        // Helper function to get run command for each example
+        function getRunCommand(exampleKey) {
+            const commands = {
+                'simple_graph': 'python simple_graph.py',
+                'llm_graph': 'python llm_graph.py',
+                'chat_loop': 'python chat_loop.py --demo',
+                'persistent_chat': 'python persistent_chat.py',
+                'tool_agent': 'python tool_agent.py',
+                'advanced_pipeline': 'python advanced_pipeline.py',
+                'requirements_transformer': 'python requirements_transformer.py',
+                'app_web_ui': 'python app.py',
+                'transformer_web_ui': 'python transformer_app.py'
+            };
+            return commands[exampleKey] || `python ${exampleKey}.py`;
+        }
+
+        // Helper function to get additional info for each example
+        function getAdditionalInfo(exampleKey) {
+            const info = {
+                'simple_graph': '<p style="margin-top: 10px; opacity: 0.8;"><strong>Note:</strong> This example runs immediately - no LLM required!</p>',
+                'llm_graph': '<p style="margin-top: 10px; opacity: 0.8;"><strong>Expected:</strong> LLM-powered sentiment analysis with confidence scores and reasoning.</p>',
+                'chat_loop': '<p style="margin-top: 10px; opacity: 0.8;"><strong>Note:</strong> Use <code>--demo</code> flag for non-interactive mode, or remove it for interactive chat.</p>',
+                'persistent_chat': '<p style="margin-top: 10px; opacity: 0.8;"><strong>Expected:</strong> Conversations with memory that persist across runs using thread IDs.</p>',
+                'tool_agent': '<p style="margin-top: 10px; opacity: 0.8;"><strong>Expected:</strong> ReAct agent that reasons, calls tools (time, calculate, weather), and provides answers.</p>',
+                'advanced_pipeline': '<p style="margin-top: 10px; opacity: 0.8;"><strong>Expected:</strong> 7-step document processing pipeline with JSON output saved to <code>_outputs/pipeline_output.json</code></p><p style="margin-top: 10px; opacity: 0.8;"><strong>📊 Visual Diagram:</strong> <a href="advanced_pipeline_diagram.html" target="_blank" style="color: #00d4ff; text-decoration: underline;">View Interactive Pipeline Diagram</a> (opens in new tab)</p>',
+                'requirements_transformer': '<p style="margin-top: 10px; opacity: 0.8;"><strong>Expected:</strong> CLI interface with human review checkpoints. Output saved to <code>_outputs/transformed_*.md</code></p>',
+                'app_web_ui': '<p style="margin-top: 10px; opacity: 0.8;"><strong>Then open:</strong> <a href="http://localhost:8080" target="_blank" style="color: #00d4ff;">http://localhost:8080</a> in your browser</p><p style="opacity: 0.8;"><strong>Features:</strong> Interactive web interface with tabs for examples A-E</p>',
+                'transformer_web_ui': '<p style="margin-top: 10px; opacity: 0.8;"><strong>Then open:</strong> <a href="http://localhost:5001" target="_blank" style="color: #00d4ff;">http://localhost:5001</a> in your browser</p><p style="opacity: 0.8;"><strong>Features:</strong> Visual pipeline with HITL approval buttons and real-time progress</p>'
+            };
+            return info[exampleKey] || '';
+        }
+
+        function loadExample() {
+            const select = document.getElementById('exampleSelect');
+            const exampleKey = select.value;
+            const example = examples[exampleKey];
+            
+            if (!example) return;
+
+            // Update content
+            const runCmd = getRunCommand(exampleKey);
+            const addInfo = getAdditionalInfo(exampleKey);
+            const contentDiv = document.getElementById('exampleContent');
+            contentDiv.innerHTML = `
+                <div class="code-section">
+                    <h3>${example.title} <span class="status-badge">Active</span></h3>
+                    <p>${example.description}</p>
+                </div>
+
+                <div class="code-section">
+                    <h3>Key Features</h3>
+                    <ul class="feature-list">
+                        ${example.features.map(f => `<li>${f}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="code-section">
+                    <h3>Code Overview</h3>
+                    <div class="code-block">
+                        <pre><code>${example.code}</code></pre>
+                    </div>
+                </div>
+
+                <div class="code-section">
+                    <h3>Try It Out</h3>
+                    <p><strong>Prerequisites:</strong></p>
+                    <ol style="margin-left: 20px; margin-bottom: 15px; opacity: 0.9;">
+                        <li>Activate virtual environment: <code>venv\\Scripts\\activate.bat</code> (CMD) or <code>venv\\Scripts\\Activate.ps1</code> (PowerShell)</li>
+                        <li>${exampleKey === 'simple_graph' ? 'No additional requirements - runs immediately!' : 'Make sure Ollama is running: <code>ollama serve</code> (in separate terminal)'}</li>
+                        ${exampleKey !== 'simple_graph' ? '<li>Model downloaded: <code>ollama pull llama3.2:1b</code></li>' : ''}
+                    </ol>
+                    ${exampleKey === 'advanced_pipeline' ? '<p style="margin-bottom: 15px;"><strong>📊 Visual Diagram:</strong> <a href="advanced_pipeline_diagram.html" target="_blank" style="color: #00d4ff; text-decoration: underline;">View Interactive Pipeline Diagram</a> (opens in new tab)</p>' : ''}
+                    <p><strong>Run this example:</strong></p>
+                    <div class="code-block">
+                        <pre><code># Windows (CMD or PowerShell)
+cd C:\\Users\\learn\\Downloads\\LangGraphDemo\\LangGraph
+venv\\Scripts\\activate.bat
+${runCmd}</code></pre>
+                    </div>
+                    ${addInfo}
+                </div>
+            `;
+
+            // Update video
+            const videoContainer = document.getElementById('videoContainer');
+            if (example.video) {
+                // Try compressed_avatars first, then fallback to avatars
+                const videoPath = example.video.replace('avatars/', 'avatars/compressed_avatars/');
+                const fallbackPath = example.video;
+                
+                videoContainer.innerHTML = `
+                    <video controls id="demoVideo" class="video-container">
+                        <source src="${videoPath}" type="video/mp4">
+                        <source src="${fallbackPath}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `;
+                
+                // Try to load video and handle errors gracefully
+                const video = document.getElementById('demoVideo');
+                if (video) {
+                    video.addEventListener('error', function() {
+                        videoContainer.innerHTML = `
+                            <div class="video-placeholder">
+                                <p>Video file not found: ${example.video}<br><br>
+                                <small>Place your HeyGen-generated MP4 file here</small></p>
+                            </div>
+                        `;
+                    });
+                }
+            } else {
+                videoContainer.innerHTML = `
+                    <div class="video-placeholder">
+                        <p>Video not available for this example</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Load first example on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            loadExample();
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangGraph Advanced Pipeline - Flow Diagram</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        /* Pipeline Flow */
+        .pipeline {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+        }
+        
+        .node {
+            position: relative;
+            width: 280px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(0, 212, 255, 0.3);
+        }
+        
+        .node-start {
+            background: linear-gradient(135deg, #00c853, #00e676);
+            color: #000;
+            width: 120px;
+            padding: 15px;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+        
+        .node-end {
+            background: linear-gradient(135deg, #ff1744, #f50057);
+            width: 120px;
+            padding: 15px;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+        
+        .node-step {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(123, 44, 191, 0.2));
+            border: 2px solid rgba(0, 212, 255, 0.5);
+        }
+        
+        .node-error {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(255, 23, 68, 0.2));
+            border: 2px solid rgba(255, 107, 107, 0.5);
+        }
+        
+        .node-number {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #7b2cbf, #00d4ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .node-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #00d4ff;
+        }
+        
+        .node-func {
+            font-family: 'Consolas', monospace;
+            font-size: 0.85em;
+            color: #ffd700;
+            margin-bottom: 8px;
+        }
+        
+        .node-desc {
+            font-size: 0.85em;
+            color: #aaa;
+            line-height: 1.4;
+        }
+        
+        /* Edges */
+        .edge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px 0;
+        }
+        
+        .edge-line {
+            width: 3px;
+            height: 30px;
+            background: linear-gradient(180deg, #00d4ff, #7b2cbf);
+        }
+        
+        .edge-arrow {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 15px solid #7b2cbf;
+        }
+        
+        .edge-label {
+            font-size: 0.75em;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        /* Conditional Branch */
+        .branch-container {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            margin: 20px 0;
+        }
+        
+        .branch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .branch-label {
+            padding: 5px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+        }
+        
+        .branch-label.success {
+            background: rgba(0, 200, 83, 0.2);
+            color: #00c853;
+        }
+        
+        .branch-label.error {
+            background: rgba(255, 23, 68, 0.2);
+            color: #ff1744;
+        }
+        
+        /* Legend */
+        .legend {
+            margin-top: 50px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .legend h3 {
+            margin-bottom: 15px;
+            color: #00d4ff;
+        }
+        
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
+        /* Code Block */
+        .code-section {
+            margin-top: 40px;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .code-section h3 {
+            margin-bottom: 15px;
+            color: #00d4ff;
+        }
+        
+        pre {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        
+        .keyword { color: #ff79c6; }
+        .string { color: #f1fa8c; }
+        .function { color: #50fa7b; }
+        .comment { color: #6272a4; }
+        
+        /* State Schema */
+        .state-section {
+            margin-top: 40px;
+        }
+        
+        .state-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .state-field {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #7b2cbf;
+        }
+        
+        .state-field-name {
+            font-family: 'Consolas', monospace;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+        
+        .state-field-type {
+            font-size: 0.85em;
+            color: #00d4ff;
+            margin-bottom: 5px;
+        }
+        
+        .state-field-desc {
+            font-size: 0.85em;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 Document Processing Pipeline</h1>
+        <p class="subtitle">LangGraph Advanced Example - Node & Edge Visualization</p>
+        
+        <!-- Pipeline Flow Diagram with Retry/Rollback -->
+        <div class="pipeline">
+            <!-- START -->
+            <div class="node node-start">START</div>
+            
+            <div class="edge">
+                <div class="edge-line"></div>
+                <div class="edge-arrow"></div>
+            </div>
+            
+            <!-- Main Pipeline Row -->
+            <div style="display: flex; gap: 40px; align-items: flex-start;">
+                <!-- Left: Main Pipeline -->
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <!-- Step 1 -->
+                    <div class="node node-step" id="step1">
+                        <div class="node-number">1</div>
+                        <div class="node-title">Load Document</div>
+                        <div class="node-func">step1_load_document()</div>
+                        <div class="node-desc">Read input file/content<br>Track: last_successful_step</div>
+                    </div>
+                    
+                    <div class="edge">
+                        <div class="edge-line"></div>
+                        <div class="edge-arrow"></div>
+                        <div class="edge-label">route_after_load</div>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="node node-step" id="step2">
+                        <div class="node-number">2</div>
+                        <div class="node-title">Parse to JSON</div>
+                        <div class="node-func">step2_parse_to_json()</div>
+                        <div class="node-desc">Convert to structured JSON<br>Extract headers & sections</div>
+                    </div>
+                    
+                    <div class="edge">
+                        <div class="edge-line"></div>
+                        <div class="edge-arrow"></div>
+                        <div class="edge-label">route_after_parse</div>
+                    </div>
+                    
+                    <!-- Step 3 -->
+                    <div class="node node-step" id="step3">
+                        <div class="node-number">3</div>
+                        <div class="node-title">Extract Sections</div>
+                        <div class="node-func">step3_extract_sections()</div>
+                        <div class="node-desc">Flatten sections & subsections<br>Normalize structure</div>
+                    </div>
+                    
+                    <div class="edge">
+                        <div class="edge-line"></div>
+                        <div class="edge-arrow"></div>
+                    </div>
+                    
+                    <!-- Step 4 -->
+                    <div class="node node-step" id="step4">
+                        <div class="node-number">4</div>
+                        <div class="node-title">Generate Prompts</div>
+                        <div class="node-func">step4_generate_prompts()</div>
+                        <div class="node-desc">Create analysis prompts<br>For each section/subsection</div>
+                    </div>
+                    
+                    <div class="edge">
+                        <div class="edge-line"></div>
+                        <div class="edge-arrow"></div>
+                    </div>
+                    
+                    <!-- Step 5 - LLM -->
+                    <div class="node node-step" style="border-color: #ffd700;" id="step5">
+                        <div class="node-number" style="background: linear-gradient(135deg, #ffd700, #ff6b6b);">5</div>
+                        <div class="node-title" style="color: #ffd700;">🤖 Run LLM Analysis</div>
+                        <div class="node-func">step5_run_llm()</div>
+                        <div class="node-desc">Execute Ollama for each prompt<br>Get structured analysis</div>
+                    </div>
+                    
+                    <div class="edge">
+                        <div class="edge-line"></div>
+                        <div class="edge-arrow"></div>
+                        <div class="edge-label">route_after_llm</div>
+                    </div>
+                    
+                    <!-- Step 6 -->
+                    <div class="node node-step" id="step6">
+                        <div class="node-number">6</div>
+                        <div class="node-title">Seed Schema</div>
+                        <div class="node-func">step6_seed_schema()</div>
+                        <div class="node-desc">Populate output schema<br>Aggregate statistics</div>
+                    </div>
+                    
+                    <div class="edge">
+                        <div class="edge-line"></div>
+                        <div class="edge-arrow"></div>
+                    </div>
+                    
+                    <!-- Step 7 -->
+                    <div class="node node-step" id="step7">
+                        <div class="node-number">7</div>
+                        <div class="node-title">Merge & Finalize</div>
+                        <div class="node-func">step7_merge_finalize()</div>
+                        <div class="node-desc">Generate final report<br>Save to JSON file</div>
+                    </div>
+                </div>
+                
+                <!-- Right: Error Handling & Retry Flow -->
+                <div style="display: flex; flex-direction: column; align-items: center; padding-top: 80px;">
+                    <div style="font-size: 0.8em; color: #ff6b6b; margin-bottom: 10px;">← On Error</div>
+                    
+                    <!-- Error Handler -->
+                    <div class="node node-error" style="width: 220px;">
+                        <div class="node-title" style="color: #ff6b6b;">🚨 Error Handler</div>
+                        <div class="node-func">handle_error()</div>
+                        <div class="node-desc">Check retry_count<br>Decide: retry or rollback</div>
+                    </div>
+                    
+                    <div class="edge">
+                        <div class="edge-line"></div>
+                        <div class="edge-arrow"></div>
+                    </div>
+                    
+                    <!-- Retry Router -->
+                    <div class="node" style="background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), rgba(255, 152, 0, 0.2)); border: 2px solid #ffc107; width: 220px;">
+                        <div class="node-title" style="color: #ffc107;">🔄 Retry Router</div>
+                        <div class="node-func">retry_router()</div>
+                        <div class="node-desc">Route to failed step<br>or rollback step</div>
+                    </div>
+                    
+                    <div class="edge">
+                        <div class="edge-line" style="height: 20px;"></div>
+                    </div>
+                    
+                    <!-- Decision Box -->
+                    <div style="display: flex; gap: 20px; margin-top: 10px;">
+                        <div style="text-align: center;">
+                            <div class="branch-label success" style="margin-bottom: 8px;">Retry</div>
+                            <div style="font-size: 0.75em; color: #888;">→ Back to<br>failed step</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div class="branch-label" style="background: rgba(255, 193, 7, 0.2); color: #ffc107; margin-bottom: 8px;">Rollback</div>
+                            <div style="font-size: 0.75em; color: #888;">→ Back to<br>previous step</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div class="branch-label error" style="margin-bottom: 8px;">Fail</div>
+                            <div style="font-size: 0.75em; color: #888;">→ END</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Retry Logic Box -->
+                    <div style="margin-top: 30px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; border-left: 3px solid #ffc107; width: 220px;">
+                        <div style="font-size: 0.85em; color: #ffc107; margin-bottom: 8px;">Retry Logic</div>
+                        <div style="font-size: 0.75em; color: #888; line-height: 1.5;">
+                            1. retry_count &lt; max_retries?<br>
+                            → Retry same step<br><br>
+                            2. Max retries reached?<br>
+                            → Rollback to last_successful_step<br><br>
+                            3. No rollback possible?<br>
+                            → End with error
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="edge">
+                <div class="edge-line"></div>
+                <div class="edge-arrow"></div>
+            </div>
+            
+            <!-- END -->
+            <div class="node node-end">END</div>
+        </div>
+        
+        <!-- Legend -->
+        <div class="legend">
+            <h3>📋 Legend</h3>
+            <div class="legend-grid">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #00c853, #00e676);"></div>
+                    <span>START - Entry point</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #ff1744, #f50057);"></div>
+                    <span>END - Exit point</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, rgba(0, 212, 255, 0.5), rgba(123, 44, 191, 0.5));"></div>
+                    <span>Processing Node - Pipeline step</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, rgba(255, 107, 107, 0.5), rgba(255, 23, 68, 0.5));"></div>
+                    <span>Error Handler - Exception handling</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(180deg, #00d4ff, #7b2cbf); width: 3px; height: 20px;"></div>
+                    <span>Edge - Flow direction</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ffd700;"></div>
+                    <span>LLM Node - Uses Ollama</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- State Schema -->
+        <div class="state-section">
+            <h3 style="color: #00d4ff; margin-bottom: 10px;">📦 Pipeline State Schema</h3>
+            <p style="color: #888; margin-bottom: 20px;">Data flows through these fields as it passes through each node:</p>
+            
+            <div class="state-grid">
+                <div class="state-field">
+                    <div class="state-field-name">input_file</div>
+                    <div class="state-field-type">str</div>
+                    <div class="state-field-desc">Path or content of input file</div>
+                </div>
+                <div class="state-field">
+                    <div class="state-field-name">raw_content</div>
+                    <div class="state-field-type">str</div>
+                    <div class="state-field-desc">Raw document content</div>
+                </div>
+                <div class="state-field">
+                    <div class="state-field-name">parsed_json</div>
+                    <div class="state-field-type">dict</div>
+                    <div class="state-field-desc">Structured JSON from document</div>
+                </div>
+                <div class="state-field">
+                    <div class="state-field-name">sections</div>
+                    <div class="state-field-type">list[dict]</div>
+                    <div class="state-field-desc">Extracted sections list</div>
+                </div>
+                <div class="state-field">
+                    <div class="state-field-name">comparison_prompts</div>
+                    <div class="state-field-type">list[dict]</div>
+                    <div class="state-field-desc">Generated LLM prompts</div>
+                </div>
+                <div class="state-field">
+                    <div class="state-field-name">llm_responses</div>
+                    <div class="state-field-type">list[dict]</div>
+                    <div class="state-field-desc">LLM analysis results</div>
+                </div>
+                <div class="state-field">
+                    <div class="state-field-name">schema_data</div>
+                    <div class="state-field-type">dict</div>
+                    <div class="state-field-desc">Schema with seeded data</div>
+                </div>
+                <div class="state-field">
+                    <div class="state-field-name">final_output</div>
+                    <div class="state-field-type">dict</div>
+                    <div class="state-field-desc">Final merged result</div>
+                </div>
+            </div>
+            
+            <h4 style="color: #ffc107; margin: 25px 0 15px 0;">🔄 Retry/Recovery Fields</h4>
+            <div class="state-grid">
+                <div class="state-field" style="border-left-color: #ffc107;">
+                    <div class="state-field-name">retry_count</div>
+                    <div class="state-field-type">int</div>
+                    <div class="state-field-desc">Current retry attempt (resets on success)</div>
+                </div>
+                <div class="state-field" style="border-left-color: #ffc107;">
+                    <div class="state-field-name">max_retries</div>
+                    <div class="state-field-type">int (default: 3)</div>
+                    <div class="state-field-desc">Maximum retries per step</div>
+                </div>
+                <div class="state-field" style="border-left-color: #ffc107;">
+                    <div class="state-field-name">last_successful_step</div>
+                    <div class="state-field-type">str</div>
+                    <div class="state-field-desc">Last step that completed successfully</div>
+                </div>
+                <div class="state-field" style="border-left-color: #ffc107;">
+                    <div class="state-field-name">failed_step</div>
+                    <div class="state-field-type">str</div>
+                    <div class="state-field-desc">Step that failed (for retry routing)</div>
+                </div>
+                <div class="state-field" style="border-left-color: #ffc107;">
+                    <div class="state-field-name">should_retry</div>
+                    <div class="state-field-type">bool</div>
+                    <div class="state-field-desc">Flag to trigger retry of failed step</div>
+                </div>
+                <div class="state-field" style="border-left-color: #ffc107;">
+                    <div class="state-field-name">should_rollback</div>
+                    <div class="state-field-type">bool</div>
+                    <div class="state-field-desc">Flag to rollback to previous step</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Code Section -->
+        <div class="code-section">
+            <h3>🔧 Graph Construction Code (with Retry/Rollback)</h3>
+            <pre><code><span class="keyword">def</span> <span class="function">create_pipeline</span>():
+    builder = StateGraph(PipelineState)
+    
+    <span class="comment"># Add all processing nodes</span>
+    builder.<span class="function">add_node</span>(<span class="string">"step1_load"</span>, step1_load_document)
+    builder.<span class="function">add_node</span>(<span class="string">"step2_parse"</span>, step2_parse_to_json)
+    builder.<span class="function">add_node</span>(<span class="string">"step3_extract"</span>, step3_extract_sections)
+    builder.<span class="function">add_node</span>(<span class="string">"step4_prompts"</span>, step4_generate_prompts)
+    builder.<span class="function">add_node</span>(<span class="string">"step5_llm"</span>, step5_run_llm)
+    builder.<span class="function">add_node</span>(<span class="string">"step6_seed"</span>, step6_seed_schema)
+    builder.<span class="function">add_node</span>(<span class="string">"step7_merge"</span>, step7_merge_finalize)
+    builder.<span class="function">add_node</span>(<span class="string">"error_handler"</span>, handle_error)
+    builder.<span class="function">add_node</span>(<span class="string">"retry_router"</span>, retry_router)  <span class="comment"># NEW: Retry routing</span>
+    
+    <span class="comment"># Define the main flow</span>
+    builder.<span class="function">add_edge</span>(START, <span class="string">"step1_load"</span>)
+    
+    <span class="comment"># Conditional routing with error handling</span>
+    builder.<span class="function">add_conditional_edges</span>(
+        <span class="string">"step1_load"</span>, route_after_load,
+        {<span class="string">"parse"</span>: <span class="string">"step2_parse"</span>, <span class="string">"error"</span>: <span class="string">"error_handler"</span>}
+    )
+    
+    builder.<span class="function">add_conditional_edges</span>(
+        <span class="string">"step2_parse"</span>, route_after_parse,
+        {<span class="string">"extract"</span>: <span class="string">"step3_extract"</span>, <span class="string">"error"</span>: <span class="string">"error_handler"</span>}
+    )
+    
+    builder.<span class="function">add_edge</span>(<span class="string">"step3_extract"</span>, <span class="string">"step4_prompts"</span>)
+    builder.<span class="function">add_edge</span>(<span class="string">"step4_prompts"</span>, <span class="string">"step5_llm"</span>)
+    
+    builder.<span class="function">add_conditional_edges</span>(
+        <span class="string">"step5_llm"</span>, route_after_llm,
+        {<span class="string">"seed"</span>: <span class="string">"step6_seed"</span>, <span class="string">"error"</span>: <span class="string">"error_handler"</span>}
+    )
+    
+    builder.<span class="function">add_edge</span>(<span class="string">"step6_seed"</span>, <span class="string">"step7_merge"</span>)
+    builder.<span class="function">add_edge</span>(<span class="string">"step7_merge"</span>, END)
+    
+    <span class="comment"># Error handler → Retry router</span>
+    builder.<span class="function">add_edge</span>(<span class="string">"error_handler"</span>, <span class="string">"retry_router"</span>)
+    
+    <span class="comment"># Retry router can go to ANY step or END</span>
+    builder.<span class="function">add_conditional_edges</span>(
+        <span class="string">"retry_router"</span>, route_after_error,
+        {
+            <span class="string">"step1_load"</span>: <span class="string">"step1_load"</span>,
+            <span class="string">"step2_parse"</span>: <span class="string">"step2_parse"</span>,
+            <span class="string">"step3_extract"</span>: <span class="string">"step3_extract"</span>,
+            <span class="string">"step4_prompts"</span>: <span class="string">"step4_prompts"</span>,
+            <span class="string">"step5_llm"</span>: <span class="string">"step5_llm"</span>,
+            <span class="string">"step6_seed"</span>: <span class="string">"step6_seed"</span>,
+            <span class="string">"step7_merge"</span>: <span class="string">"step7_merge"</span>,
+            <span class="string">"end"</span>: END
+        }
+    )
+    
+    <span class="keyword">return</span> builder.<span class="function">compile</span>()</code></pre>
+        </div>
+        
+        <!-- Summary Table -->
+        <div class="code-section" style="margin-top: 30px;">
+            <h3>📊 Pipeline Summary</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                <thead>
+                    <tr style="border-bottom: 2px solid rgba(0, 212, 255, 0.3);">
+                        <th style="text-align: left; padding: 12px; color: #00d4ff;">Step</th>
+                        <th style="text-align: left; padding: 12px; color: #00d4ff;">Node</th>
+                        <th style="text-align: left; padding: 12px; color: #00d4ff;">Input</th>
+                        <th style="text-align: left; padding: 12px; color: #00d4ff;">Output</th>
+                        <th style="text-align: left; padding: 12px; color: #00d4ff;">Uses LLM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <td style="padding: 12px;">1</td>
+                        <td style="padding: 12px; font-family: monospace; color: #ffd700;">step1_load</td>
+                        <td style="padding: 12px;">input_file</td>
+                        <td style="padding: 12px;">raw_content</td>
+                        <td style="padding: 12px;">❌</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <td style="padding: 12px;">2</td>
+                        <td style="padding: 12px; font-family: monospace; color: #ffd700;">step2_parse</td>
+                        <td style="padding: 12px;">raw_content</td>
+                        <td style="padding: 12px;">parsed_json</td>
+                        <td style="padding: 12px;">❌</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <td style="padding: 12px;">3</td>
+                        <td style="padding: 12px; font-family: monospace; color: #ffd700;">step3_extract</td>
+                        <td style="padding: 12px;">parsed_json</td>
+                        <td style="padding: 12px;">sections</td>
+                        <td style="padding: 12px;">❌</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <td style="padding: 12px;">4</td>
+                        <td style="padding: 12px; font-family: monospace; color: #ffd700;">step4_prompts</td>
+                        <td style="padding: 12px;">sections</td>
+                        <td style="padding: 12px;">comparison_prompts</td>
+                        <td style="padding: 12px;">❌</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 215, 0, 0.1);">
+                        <td style="padding: 12px;">5</td>
+                        <td style="padding: 12px; font-family: monospace; color: #ffd700;">step5_llm</td>
+                        <td style="padding: 12px;">comparison_prompts</td>
+                        <td style="padding: 12px;">llm_responses</td>
+                        <td style="padding: 12px;">✅ Ollama</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <td style="padding: 12px;">6</td>
+                        <td style="padding: 12px; font-family: monospace; color: #ffd700;">step6_seed</td>
+                        <td style="padding: 12px;">llm_responses</td>
+                        <td style="padding: 12px;">schema_data</td>
+                        <td style="padding: 12px;">❌</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 12px;">7</td>
+                        <td style="padding: 12px; font-family: monospace; color: #ffd700;">step7_merge</td>
+                        <td style="padding: 12px;">schema_data</td>
+                        <td style="padding: 12px;">final_output</td>
+                        <td style="padding: 12px;">❌</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px; padding: 20px; color: #666;">
+            <p>Run the pipeline: <code style="background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 4px;">python advanced_pipeline.py</code></p>
+            <p style="margin-top: 10px;">Output saved to: <code style="background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 4px;">pipeline_output.json</code></p>
+        </div>
+    </div>
+</body>
+</html>
+
