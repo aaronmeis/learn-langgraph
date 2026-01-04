@@ -2,6 +2,7 @@
 
 A complete set of examples demonstrating **LangGraph** with **Pydantic** and **Ollama** (local LLM), including advanced pipelines with Human-in-the-Loop (HITL) and a Flask web interface.
 
+![Overview](./unnamed.png)
 ## 🎯 Examples Overview
 
 | File | Description | Ollama | HITL | Web UI | Port |
@@ -489,3 +490,4 @@ Then open http://localhost:8000/demo.html in your browser. The demo page include
 - **Syntax Fixes**: Fixed indentation errors in `chat_loop.py` and `advanced_pipeline.py`
 - **Dark Theme**: Updated `sample_transformer_app.py` with dark theme for better contrast
 - **Verified**: All examples tested and working
+
